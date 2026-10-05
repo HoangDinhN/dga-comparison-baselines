@@ -10,7 +10,7 @@ Repository chỉ chứa các baseline so sánh; phương pháp đề xuất, Rou
 |---|---|---|
 | [`bilbo_inference`](baselines/bilbo_inference/) | BILBO | Model BILBO cho phát hiện DGA |
 | [`deepdga_inference`](baselines/deepdga_inference/) | DeepDGA | Character BiLSTM kết hợp Word2Vec và TF-IDF |
-| [`fanci_150_inference`](baselines/fanci_150_inference/) | FANCI | Official45 Random Forest, 150 cây |
+| [`fanci_150_inference`](baselines/fanci_150_inference/) | FANCI | Official45 Random Forest, 785 cây-> 150 cây |
 | [`fasttext_cnn_lstm_fd32_inference`](baselines/fasttext_cnn_lstm_fd32_inference/) | FastText CNN-LSTM | Full-domain length 32, embedding 300→128, Last Valid LSTM |
 | [`lstm_mi_inference`](baselines/lstm_mi_inference/) | LSTM-MI | LSTM-MI cho phát hiện DGA |
 
