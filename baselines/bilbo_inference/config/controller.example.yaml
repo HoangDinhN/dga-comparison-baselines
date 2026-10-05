@@ -1,0 +1,40 @@
+rabbitmq:
+  url: "${DGA_RABBITMQ_URL:-amqp://guest:guest@localhost:5672/%2F}"
+  queue_prefix: "${DGA_QUEUE_PREFIX:-dga.bilbo}"
+  heartbeat_seconds: 30
+  blocked_timeout_seconds: 60
+  connection_attempts: 10
+  retry_delay_seconds: 2
+  socket_timeout_seconds: 10
+  durable: true
+  queue_type: "classic"
+  persistent_messages: false
+
+artifact_server:
+  bind_host: "0.0.0.0"
+  port: 8080
+  public_base_url: "http://192.168.101.99:8080"
+  token: "${DGA_ARTIFACT_TOKEN:-replace-this-token}"
+
+# Mô hình mới chỉ có MỘT nhánh worker.
+model_artifacts:
+  worker:
+    checkpoint: "/home/machine-9/hoang/bilbo_inference/artifact/bilbo.pt_ver2"
+
+bootstrap:
+  required_router_clients: 1
+  required_model_workers: 7
+  registration_stale_seconds: 30
+
+client:
+  assignment_retry_seconds: 15
+
+metrics:
+  accuracy_enabled: true
+  report_interval_seconds: 10
+  output_jsonl: "./var/test_genAI/telemetrys.jsonl"
+
+results:
+  enabled: true
+  prefetch: 1000
+  output_jsonl: "./var/test_genAI/results.jsonl"

@@ -1,0 +1,157 @@
+====================================================================================================
+LSTM_MI TELEMETRY ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/telemetrys.jsonl
+Architecture             : Single branch (Router passthrough -> jobs.worker -> LSTM_MI workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 171
+Valid metric records     : 171
+JSON errors              : 0
+Non-metric records       : 0
+Client count             : 8
+Router clients           : router-01
+Worker clients           : worker-01, worker-02, worker-03, worker-04, worker-05, worker-06, worker-07
+Unknown-role records     : 0
+Experiment duration      : 214.629 s
+
+Detected vCPU count from telemetry:
+  router-01               : 2
+  worker-01               : 2
+  worker-02               : 1
+  worker-03               : 1
+  worker-04               : 1
+  worker-05               : 4
+  worker-06               : 4
+  worker-07               : 2
+
+====================================================================================================
+2. WORKLOAD DISTRIBUTION
+====================================================================================================
+Worker count             : 7
+Total processed          : 1,000,000 domains
+Predicted Benign         : 745,844
+Predicted DGA            : 254,156
+Telemetry accuracy       : 98.1478% (981,478/1,000,000)
+
+Worker                        Processed     Load share
+------------------------------------------------------
+worker-02                       147,255         14.73%
+worker-03                       146,830         14.68%
+worker-04                       146,245         14.62%
+worker-01                       140,562         14.06%
+worker-05                       140,196         14.02%
+worker-07                       139,825         13.98%
+worker-06                       139,087         13.91%
+
+====================================================================================================
+3. THROUGHPUT
+====================================================================================================
+Average worker throughput: 677.626 domains/s
+Average throughput/vCPU  : 441.440 domains/s/vCPU
+System throughput        : 4659.203 domains/s
+Worker wall-clock span   : 214.629 s
+
+Worker                   vCPU     Processed     Active(s)      domains/s    domains/s/vCPU
+------------------------------------------------------------------------------------------
+worker-01                   2       140,562       210.070        669.119           334.560
+worker-02                   1       147,255       212.979        691.405           691.405
+worker-03                   1       146,830       205.234        715.426           715.426
+worker-04                   1       146,245       207.412        705.093           705.093
+worker-05                   4       140,196       209.638        668.754           167.188
+worker-06                   4       139,087       212.326        655.063           163.766
+worker-07                   2       139,825       214.592        651.584           325.792
+
+====================================================================================================
+4. INFERENCE LATENCY
+====================================================================================================
+Average inference latency: 0.441 ms
+P95 inference latency*   : 0.831 ms
+
+* P95 here is the processed-weighted mean of each telemetry window's reported P95;
+  it is not the exact global P95 across all domains.
+  In lstm_mi_inference, inference_ms is batch predict_many() time divided by batch size,
+  so it includes hostname cleaning/encoding + tensor creation + packed LSTM forward + output handling.
+
+====================================================================================================
+5. END-TO-END LATENCY
+====================================================================================================
+Average E2E latency      : 127.680 ms
+P95 E2E latency*         : 227.592 ms
+
+* P95 here is the processed-weighted mean of window P95 values, not an exact global P95.
+  E2E starts from Router-created created_at immediately before job publishing and ends after
+  worker prediction completion; it therefore reflects queueing + batching + model pipeline time.
+
+====================================================================================================
+6. CPU UTILIZATION
+====================================================================================================
+Client                  Role         vCPU    Normalized CPU %    System CPU %
+-----------------------------------------------------------------------------
+router-01               router          2               31.86           31.11
+worker-01               worker          2               31.17           32.07
+worker-02               worker          1               53.79           54.25
+worker-03               worker          1               55.24           55.66
+worker-04               worker          1               55.49           56.53
+worker-05               worker          4               18.00           18.43
+worker-06               worker          4               17.54           17.55
+worker-07               worker          2               30.30           30.99
+
+====================================================================================================
+7. MEMORY UTILIZATION
+====================================================================================================
+Client                  Role          Process RAM MB    System RAM %
+--------------------------------------------------------------------
+router-01               router                252.30           17.75
+worker-01               worker                229.50           16.64
+worker-02               worker                226.64           15.69
+worker-03               worker                226.70           15.10
+worker-04               worker                227.63           14.20
+worker-05               worker                229.23           22.84
+worker-06               worker                229.68           18.85
+worker-07               worker                227.13           23.53
+
+Total mean worker RSS    : 1596.52 MB (sum of per-worker mean RSS)
+
+====================================================================================================
+8. ERRORS & STABILITY
+====================================================================================================
+Total errors             : 0
+Windows with errors      : 0
+Status                   : Stable - no telemetry errors detected
+
+====================================================================================================
+9. ROUTER / SINGLE-BRANCH PIPELINE
+====================================================================================================
+Router count             : 1
+Worker count             : 7
+Total routed             : 1,000,000 domains
+Routed to jobs.worker    : 1,000,000 domains
+Total worker processed   : 1,000,000 domains
+Processed / routed       : 100.00%
+Router throughput        : 4817.524 domains/s
+Router decision latency  : 0.000 ms avg
+Router decision P95*     : 0.000 ms
+
+The router is passthrough: all jobs should be routed to jobs.worker. routing_ms measures only
+the trivial single-branch routing decision, not RabbitMQ publish/network latency.
+
+====================================================================================================
+10. BOTTLENECK INDICATORS
+====================================================================================================
+E2E / inference ratio    : 289.53x
+
+[1] Queue/backlog dominates: E2E latency is much larger than LSTM_MI inference time.
+[2] CPU: no worker shows sustained >=85% CPU saturation in the averaged telemetry.
+[3] Workload is approximately balanced across workers (13.91% - 14.73%).
+[4] Memory: no client has average system RAM usage >=85%.
+[5] Pipeline completion: worker processed count matches router routed count.
+[6] Stability: no telemetry errors were recorded.
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/telemetrys_report.txt

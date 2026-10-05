@@ -1,0 +1,35 @@
+rabbitmq:
+  url: "${DGA_RABBITMQ_URL:-amqp://guest:guest@localhost:5672/%2F}"
+  queue_prefix: "${DGA_QUEUE_PREFIX:-dga.bilbo}"
+  heartbeat_seconds: 30
+  blocked_timeout_seconds: 60
+  connection_attempts: 10
+  retry_delay_seconds: 2
+  socket_timeout_seconds: 10
+  durable: true
+  queue_type: "classic"
+  persistent_messages: false
+
+client:
+  id: "router-01"
+  preferred_role: "router"
+  capabilities: ["router"]
+  registration_interval_seconds: 5
+  artifact_download_timeout_seconds: 300
+  strict_artifacts: true
+  switch_timeout_seconds: 30
+  control_queue_expiry_ms: 86400000
+  control_queue_max_messages: 20
+
+router_input:
+  csv_path: "/home/machine-3/hoang/data/test_genAI.csv"
+  random_seed: 2026
+  batch_size: 512
+  loop_forever: true
+  max_records: 1000000
+  max_publish_rate_per_second: 0
+  max_total_queue_depth: 50000
+  publisher_confirms: false
+
+metrics:
+  report_interval_seconds: 10

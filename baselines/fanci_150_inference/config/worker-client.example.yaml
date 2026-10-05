@@ -1,0 +1,42 @@
+rabbitmq:
+  url: "${DGA_RABBITMQ_URL:-amqp://guest:guest@localhost:5672/%2F}"
+  queue_prefix: "${DGA_QUEUE_PREFIX:-dga.fanci_150}"
+  heartbeat_seconds: 30
+  blocked_timeout_seconds: 60
+  connection_attempts: 10
+  retry_delay_seconds: 2
+  socket_timeout_seconds: 10
+  durable: true
+  queue_type: "classic"
+  persistent_messages: false
+
+client:
+  # Change this on each worker: worker-01, worker-02, ..., worker-07.
+  id: "worker-07"
+  preferred_role: "worker"
+  capabilities: ["worker"]
+  registration_interval_seconds: 5
+  # The 150-tree bundle is about 194 MiB; allow time for controller download.
+  artifact_download_timeout_seconds: 900
+  strict_artifacts: true
+  switch_timeout_seconds: 120
+  control_queue_expiry_ms: 86400000
+  control_queue_max_messages: 20
+
+workers:
+  worker:
+    batch_size: 256
+    batch_wait_ms: 10
+    prefetch: 512
+    # Feature extraction is Python-heavy. Start with one job to avoid nested
+    # CPU oversubscription; benchmark 2 or 4 only on workers with enough cores.
+    feature_n_jobs: 1
+    # null keeps n_jobs=-1 stored by the training notebook's RandomForest.
+    # Set 1 for a strict one-vCPU comparison across baselines.
+    rf_n_jobs: null
+    # best = validation-tuned threshold; paper = fixed threshold 0.5.
+    threshold_mode: "best"
+
+metrics:
+  report_interval_seconds: 10
+

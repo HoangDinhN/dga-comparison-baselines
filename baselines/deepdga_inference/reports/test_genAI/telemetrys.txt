@@ -1,0 +1,158 @@
+====================================================================================================
+DeepDGA TELEMETRY ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/telemetrys.jsonl
+Architecture             : Single branch (Router passthrough -> jobs.worker -> DeepDGA workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 234
+Valid metric records     : 234
+JSON errors              : 0
+Non-metric records       : 0
+Client count             : 8
+Router clients           : router-01
+Worker clients           : worker-01, worker-02, worker-03, worker-04, worker-05, worker-06, worker-07
+Unknown-role records     : 0
+Experiment duration      : 297.196 s
+
+Detected vCPU count from telemetry:
+  router-01               : 2
+  worker-01               : 2
+  worker-02               : 1
+  worker-03               : 1
+  worker-04               : 1
+  worker-05               : 4
+  worker-06               : 4
+  worker-07               : 2
+
+====================================================================================================
+2. WORKLOAD DISTRIBUTION
+====================================================================================================
+Worker count             : 7
+Total processed          : 1,000,000 domains
+Predicted Benign         : 746,402
+Predicted DGA            : 253,598
+Telemetry accuracy       : 98.2716% (982,716/1,000,000)
+
+Worker                        Processed     Load share
+------------------------------------------------------
+worker-04                       154,276         15.43%
+worker-02                       153,924         15.39%
+worker-03                       153,017         15.30%
+worker-06                       135,391         13.54%
+worker-05                       135,207         13.52%
+worker-07                       134,925         13.49%
+worker-01                       133,260         13.33%
+
+====================================================================================================
+3. THROUGHPUT
+====================================================================================================
+Average worker throughput: 489.102 domains/s
+Average throughput/vCPU  : 324.575 domains/s/vCPU
+System throughput        : 3376.286 domains/s
+Worker wall-clock span   : 296.183 s
+
+Worker                   vCPU     Processed     Active(s)      domains/s    domains/s/vCPU
+------------------------------------------------------------------------------------------
+worker-01                   2       133,260       287.560        463.416           231.708
+worker-02                   1       153,924       290.077        530.631           530.631
+worker-03                   1       153,017       293.255        521.789           521.789
+worker-04                   1       154,276       295.501        522.082           522.082
+worker-05                   4       135,207       287.362        470.512           117.628
+worker-06                   4       135,391       290.130        466.657           116.664
+worker-07                   2       134,925       292.795        460.818           230.409
+
+====================================================================================================
+4. INFERENCE LATENCY
+====================================================================================================
+Average inference latency: 1.188 ms
+P95 inference latency*   : 1.699 ms
+
+* P95 here is the processed-weighted mean of each telemetry window's reported P95;
+  it is not the exact global P95 across all domains.
+  In deepdga_inference, inference_ms is batch predict_many() time divided by batch size,
+  so it includes hostname normalization, word segmentation/aggregation, tensor creation,
+  packed BiLSTM/fusion forward, and output handling.
+
+====================================================================================================
+5. END-TO-END LATENCY
+====================================================================================================
+Average E2E latency      : 13688.671 ms
+P95 E2E latency*         : 14259.797 ms
+
+* P95 here is the processed-weighted mean of window P95 values, not an exact global P95.
+  E2E starts from Router-created created_at immediately before job publishing and ends after
+  worker prediction completion; it therefore reflects queueing + batching + model pipeline time.
+
+====================================================================================================
+6. CPU UTILIZATION
+====================================================================================================
+Client                  Role         vCPU    Normalized CPU %    System CPU %
+-----------------------------------------------------------------------------
+router-01               router          2               25.11           25.82
+worker-01               worker          2               43.09           44.37
+worker-02               worker          1               75.58           76.06
+worker-03               worker          1               74.53           75.00
+worker-04               worker          1               74.40           75.10
+worker-05               worker          4               25.19           25.67
+worker-06               worker          4               24.82           25.01
+worker-07               worker          2               42.14           42.54
+
+====================================================================================================
+7. MEMORY UTILIZATION
+====================================================================================================
+Client                  Role          Process RAM MB    System RAM %
+--------------------------------------------------------------------
+router-01               router                252.65           17.77
+worker-01               worker                370.95           18.83
+worker-02               worker                367.36           18.10
+worker-03               worker                367.01           17.70
+worker-04               worker                366.91           15.60
+worker-05               worker                371.92           25.73
+worker-06               worker                367.31           20.96
+worker-07               worker                368.21           24.81
+
+Total mean worker RSS    : 2579.67 MB (sum of per-worker mean RSS)
+
+====================================================================================================
+8. ERRORS & STABILITY
+====================================================================================================
+Total errors             : 0
+Windows with errors      : 0
+Status                   : Stable - no telemetry errors detected
+
+====================================================================================================
+9. ROUTER / SINGLE-BRANCH PIPELINE
+====================================================================================================
+Router count             : 1
+Worker count             : 7
+Total routed             : 1,000,000 domains
+Routed to jobs.worker    : 1,000,000 domains
+Total worker processed   : 1,000,000 domains
+Processed / routed       : 100.00%
+Router throughput        : 3670.427 domains/s
+Router decision latency  : 0.000 ms avg
+Router decision P95*     : 0.000 ms
+
+The router is passthrough: all jobs should be routed to jobs.worker. routing_ms measures only
+the trivial single-branch routing decision, not RabbitMQ publish/network latency.
+
+====================================================================================================
+10. BOTTLENECK INDICATORS
+====================================================================================================
+E2E / inference ratio    : 11525.27x
+
+[1] Queue/backlog dominates: E2E latency is much larger than DeepDGA inference time.
+[2] CPU: no worker shows sustained >=85% CPU saturation in the averaged telemetry.
+[3] Workload is approximately balanced across workers (13.33% - 15.43%).
+[4] Memory: no client has average system RAM usage >=85%.
+[5] Pipeline completion: worker processed count matches router routed count.
+[6] Stability: no telemetry errors were recorded.
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/telemetrys_report.txt

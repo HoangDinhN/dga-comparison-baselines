@@ -1,0 +1,179 @@
+====================================================================================================
+FANCI_RF_Official45_150Trees RESULTS ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/results_1M.jsonl
+Architecture             : Single branch (Router -> jobs.worker -> FANCI_RF_Official45_150Trees workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 1,000,000
+Empty lines              : 0
+Valid JSON records       : 1,000,000
+Inference results        : 1,000,000
+JSON errors              : 0
+Unexpected record types  : 0
+Unique job_id            : 1,000,000
+Duplicate job_id         : 0
+Unique source_id         : 123,293
+Duplicate source_id      : 876,707
+Unique domains           : 123,293
+Duplicate domains        : 876,707
+Missing truth            : 0
+Invalid truth/prediction : 0
+Missing/invalid score    : 0 / 0
+Label/prediction mismatch: 0
+
+====================================================================================================
+2. DATASET AND PREDICTION DISTRIBUTION
+====================================================================================================
+Evaluated records        : 1,000,000
+Truth Benign             : 740,344 (74.03%)
+Truth DGA                : 259,656 (25.97%)
+Predicted Benign         : 793,897 (79.39%)
+Predicted DGA            : 206,103 (20.61%)
+
+====================================================================================================
+3. CONFUSION MATRIX
+====================================================================================================
+                    Predicted
+                Benign       DGA
+Truth Benign    717803       22541
+Truth DGA       76094        183562
+
+TN                       : 717,803
+FP                       : 22,541
+FN                       : 76,094
+TP                       : 183,562
+
+====================================================================================================
+4. CLASSIFICATION METRICS
+====================================================================================================
+Accuracy                 : 90.1365%
+Precision (DGA)          : 89.0632%
+Recall (DGA)             : 70.6943%
+F1-score (DGA)           : 78.8227%
+Specificity              : 96.9553%
+False positive rate      : 3.0447%
+False negative rate      : 29.3057%
+
+====================================================================================================
+5. MODEL SCORE SUMMARY
+====================================================================================================
+Score samples            : 1,000,000
+Overall mean score       : 0.260788
+Mean score | Truth Benign: 0.098964
+Mean score | Truth DGA   : 0.722187
+Minimum score            : 0.000000
+Maximum score            : 1.000000
+
+Note: score is the FANCI_RF_Official45_150Trees Random Forest DGA probability. The decision threshold is stored in the model bundle,
+not in each result record, so this analyzer does not assume or reconstruct a threshold.
+
+====================================================================================================
+6. WORKER DISTRIBUTION AND PERFORMANCE
+====================================================================================================
+Worker                     Results     Share     Accuracy       FP       FN     Avg E2E ms
+------------------------------------------------------------------------------------------
+worker-02                  150,868    15.09%     90.0019%    3,470   11,614      16708.603
+worker-04                  148,418    14.84%     90.1474%    3,263   11,360      16599.059
+worker-03                  148,368    14.84%     90.1225%    3,432   11,223      16557.595
+worker-07                  142,454    14.25%     90.1442%    3,254   10,786      16824.846
+worker-01                  140,568    14.06%     90.1613%    3,133   10,697      16736.726
+worker-06                  137,212    13.72%     90.1641%    3,054   10,442      16837.432
+worker-05                  132,112    13.21%     90.2303%    2,935    9,972      16832.912
+
+====================================================================================================
+7. SINGLE-BRANCH PIPELINE CONSISTENCY
+====================================================================================================
+Route distribution:
+  worker                :    1,000,000 (100.00%)
+
+Model distribution:
+  FANCI_RF_Official45_150Trees:    1,000,000 (100.00%)
+
+Unexpected non-worker route: 0
+Pipeline status           : Consistent with single-branch architecture
+
+====================================================================================================
+8. END-TO-END LATENCY
+====================================================================================================
+Samples                  : 1,000,000
+Average                  : 16724.552 ms
+P50                      : 16148.287 ms
+P95                      : 21082.534 ms
+P99                      : 21902.339 ms
+Maximum                  : 23493.881 ms
+
+E2E is computed from result.created_at to result.completed_at. In this project created_at is set
+by the Router immediately before publishing jobs, so E2E includes queue wait + worker batching +
+FANCI RF predict_many() processing, but not CSV loading or the router's earlier source work.
+
+====================================================================================================
+9. DGA FAMILY ANALYSIS
+====================================================================================================
+Family                             Samples          TP          FN         Recall
+---------------------------------------------------------------------------------
+ccleaner                            64,430      64,422           8         99.99%
+qadars                              23,924      23,178         746         96.88%
+gozi                                15,941       3,997      11,944         25.07%
+suppobox                            12,170         585      11,585          4.81%
+deepdga                              9,722       9,195         527         94.58%
+improved_pykspa                      8,209       4,429       3,780         53.95%
+titan                                8,113         616       7,497          7.59%
+bigviktor                            6,659       1,823       4,836         27.38%
+enviserv                             6,587       6,571          16         99.76%
+chinad                               6,529       6,375         154         97.64%
+mydoom                               6,119       4,908       1,211         80.21%
+dnschanger                           4,379       3,062       1,317         69.92%
+murofetv1                            4,361       3,955         406         90.69%
+ranbyus                              4,347       3,876         471         89.16%
+banjori                              4,323       4,241          82         98.10%
+fobber                               4,205       3,426         779         81.47%
+ramnit                               4,189       2,817       1,372         67.25%
+nymaim                               4,177       1,959       2,218         46.90%
+vawtrak                              4,171           8       4,163          0.19%
+vawtrak_1                            4,162       2,022       2,140         48.58%
+ramdo                                4,122       2,501       1,621         60.67%
+qakbot                               4,073       2,950       1,123         72.43%
+newgoz                               4,063       4,031          32         99.21%
+vawktrak_1                           4,035           0       4,035          0.00%
+necurs                               4,032       2,499       1,533         61.98%
+murofetv3                            4,007       4,007           0        100.00%
+dircrypt                             3,940       2,467       1,473         62.61%
+proslikefan                          3,889       1,377       2,512         35.41%
+precursor_pykspa                     3,805       1,175       2,630         30.88%
+locklyv3                             3,757       2,280       1,477         60.69%
+simda                                3,709       2,652       1,057         71.50%
+tempedreve                           2,975       1,541       1,434         51.80%
+murofetv2                            2,261       1,775         486         78.51%
+shiotob                              1,648       1,347         301         81.74%
+kraken_v2                            1,430         647         783         45.24%
+tinba                                1,036         740         296         71.43%
+padcrypt                                74          50          24         67.57%
+vidro                                   58          50           8         86.21%
+sisron                                   9           0           9          0.00%
+locklyv2                                 8           0           8          0.00%
+kraken_v1                                8           8           0        100.00%
+
+====================================================================================================
+10. WORST DGA FAMILIES BY RECALL
+====================================================================================================
+Family                             Samples          FN         Recall
+---------------------------------------------------------------------
+vawktrak_1                           4,035       4,035          0.00%
+sisron                                   9           9          0.00%
+locklyv2                                 8           8          0.00%
+vawtrak                              4,171       4,163          0.19%
+suppobox                            12,170      11,585          4.81%
+titan                                8,113       7,497          7.59%
+gozi                                15,941      11,944         25.07%
+bigviktor                            6,659       4,836         27.38%
+precursor_pykspa                     3,805       2,630         30.88%
+proslikefan                          3,889       2,512         35.41%
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/results_1M_report.txt

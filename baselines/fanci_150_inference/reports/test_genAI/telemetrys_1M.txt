@@ -1,0 +1,157 @@
+====================================================================================================
+FANCI_RF_Official45_150Trees TELEMETRY ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/telemetrys_1M.jsonl
+Architecture             : Single branch (Router passthrough -> jobs.worker -> FANCI_RF_Official45_150Trees workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 217
+Valid metric records     : 217
+JSON errors              : 0
+Non-metric records       : 0
+Client count             : 8
+Router clients           : router-01
+Worker clients           : worker-01, worker-02, worker-03, worker-04, worker-05, worker-06, worker-07
+Unknown-role records     : 0
+Experiment duration      : 286.693 s
+
+Detected vCPU count from telemetry:
+  router-01               : 2
+  worker-01               : 2
+  worker-02               : 1
+  worker-03               : 1
+  worker-04               : 1
+  worker-05               : 4
+  worker-06               : 4
+  worker-07               : 2
+
+====================================================================================================
+2. WORKLOAD DISTRIBUTION
+====================================================================================================
+Worker count             : 7
+Total processed          : 1,000,000 domains
+Predicted Benign         : 793,897
+Predicted DGA            : 206,103
+Telemetry accuracy       : 90.1365% (901,365/1,000,000)
+
+Worker                        Processed     Load share
+------------------------------------------------------
+worker-02                       150,868         15.09%
+worker-04                       148,418         14.84%
+worker-03                       148,368         14.84%
+worker-07                       142,454         14.25%
+worker-01                       140,568         14.06%
+worker-06                       137,212         13.72%
+worker-05                       132,112         13.21%
+
+====================================================================================================
+3. THROUGHPUT
+====================================================================================================
+Average worker throughput: 533.121 domains/s
+Average throughput/vCPU  : 351.103 domains/s/vCPU
+System throughput        : 3619.502 domains/s
+Worker wall-clock span   : 276.281 s
+
+Worker                   vCPU     Processed     Active(s)      domains/s    domains/s/vCPU
+------------------------------------------------------------------------------------------
+worker-01                   2       140,568       265.646        529.155           264.577
+worker-02                   1       150,868       262.741        574.208           574.208
+worker-03                   1       148,368       266.319        557.107           557.107
+worker-04                   1       148,418       274.609        540.470           540.470
+worker-05                   4       132,112       267.574        493.740           123.435
+worker-06                   4       137,212       267.169        513.578           128.395
+worker-07                   2       142,454       269.872        527.857           263.928
+
+====================================================================================================
+4. INFERENCE LATENCY
+====================================================================================================
+Average inference latency: 1.362 ms
+P95 inference latency*   : 1.901 ms
+
+* P95 here is the processed-weighted mean of each telemetry window's reported P95;
+  it is not the exact global P95 across all domains.
+  In fanci_150_inference, inference_ms is batch predict_many() time divided by batch size,
+  so it includes Official45 feature extraction + Random Forest predict_proba + output handling.
+
+====================================================================================================
+5. END-TO-END LATENCY
+====================================================================================================
+Average E2E latency      : 16724.552 ms
+P95 E2E latency*         : 18377.943 ms
+
+* P95 here is the processed-weighted mean of window P95 values, not an exact global P95.
+  E2E starts from Router-created created_at immediately before job publishing and ends after
+  worker prediction completion; it therefore reflects queueing + batching + model pipeline time.
+
+====================================================================================================
+6. CPU UTILIZATION
+====================================================================================================
+Client                  Role         vCPU    Normalized CPU %    System CPU %
+-----------------------------------------------------------------------------
+router-01               router          2               22.83           22.94
+worker-01               worker          2               45.79           46.88
+worker-02               worker          1               85.38           85.76
+worker-03               worker          1               83.73           84.04
+worker-04               worker          1               83.35           83.92
+worker-05               worker          4               22.83           23.80
+worker-06               worker          4               23.46           23.81
+worker-07               worker          2               46.07           46.69
+
+====================================================================================================
+7. MEMORY UTILIZATION
+====================================================================================================
+Client                  Role          Process RAM MB    System RAM %
+--------------------------------------------------------------------
+router-01               router                 77.52           16.81
+worker-01               worker               1128.35           32.70
+worker-02               worker               1130.83           32.80
+worker-03               worker               1130.43           31.40
+worker-04               worker               1121.24           24.40
+worker-05               worker               1117.70           45.14
+worker-06               worker               1131.84           42.47
+worker-07               worker               1130.49           38.11
+
+Total mean worker RSS    : 7890.89 MB (sum of per-worker mean RSS)
+
+====================================================================================================
+8. ERRORS & STABILITY
+====================================================================================================
+Total errors             : 0
+Windows with errors      : 0
+Status                   : Stable - no telemetry errors detected
+
+====================================================================================================
+9. ROUTER / SINGLE-BRANCH PIPELINE
+====================================================================================================
+Router count             : 1
+Worker count             : 7
+Total routed             : 1,000,000 domains
+Routed to jobs.worker    : 1,000,000 domains
+Total worker processed   : 1,000,000 domains
+Processed / routed       : 100.00%
+Router throughput        : 4136.460 domains/s
+Router decision latency  : 0.000 ms avg
+Router decision P95*     : 0.000 ms
+
+The router is passthrough: all jobs should be routed to jobs.worker. routing_ms measures only
+the trivial single-branch routing decision, not RabbitMQ publish/network latency.
+
+====================================================================================================
+10. BOTTLENECK INDICATORS
+====================================================================================================
+E2E / inference ratio    : 12276.55x
+
+[1] Queue/backlog dominates: E2E latency is much larger than FANCI RF inference time.
+[2] Worker CPU saturation: worker-02.
+[3] Workload is approximately balanced across workers (13.21% - 15.09%).
+[4] Memory: no client has average system RAM usage >=85%.
+[5] Pipeline completion: worker processed count matches router routed count.
+[6] Stability: no telemetry errors were recorded.
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/telemetrys_1M_report.txt

@@ -1,0 +1,179 @@
+====================================================================================================
+FastText_CNN_LSTM_FD32 RESULTS ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/results_1M.jsonl
+Architecture             : Single branch (Router -> jobs.worker -> FastText_CNN_LSTM_FD32 workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 1,000,000
+Empty lines              : 0
+Valid JSON records       : 1,000,000
+Inference results        : 1,000,000
+JSON errors              : 0
+Unexpected record types  : 0
+Unique job_id            : 1,000,000
+Duplicate job_id         : 0
+Unique source_id         : 123,293
+Duplicate source_id      : 876,707
+Unique domains           : 123,293
+Duplicate domains        : 876,707
+Missing truth            : 0
+Invalid truth/prediction : 0
+Missing/invalid score    : 0 / 0
+Label/prediction mismatch: 0
+
+====================================================================================================
+2. DATASET AND PREDICTION DISTRIBUTION
+====================================================================================================
+Evaluated records        : 1,000,000
+Truth Benign             : 740,344 (74.03%)
+Truth DGA                : 259,656 (25.97%)
+Predicted Benign         : 743,693 (74.37%)
+Predicted DGA            : 256,307 (25.63%)
+
+====================================================================================================
+3. CONFUSION MATRIX
+====================================================================================================
+                    Predicted
+                Benign       DGA
+Truth Benign    732414       7930
+Truth DGA       11279        248377
+
+TN                       : 732,414
+FP                       : 7,930
+FN                       : 11,279
+TP                       : 248,377
+
+====================================================================================================
+4. CLASSIFICATION METRICS
+====================================================================================================
+Accuracy                 : 98.0791%
+Precision (DGA)          : 96.9061%
+Recall (DGA)             : 95.6562%
+F1-score (DGA)           : 96.2771%
+Specificity              : 98.9289%
+False positive rate      : 1.0711%
+False negative rate      : 4.3438%
+
+====================================================================================================
+5. MODEL SCORE SUMMARY
+====================================================================================================
+Score samples            : 1,000,000
+Overall mean score       : 0.257631
+Mean score | Truth Benign: 0.015914
+Mean score | Truth DGA   : 0.946824
+Minimum score            : 0.000000
+Maximum score            : 1.000000
+
+Note: score is the FastText_CNN_LSTM_FD32 sigmoid output. The decision threshold is stored in the model bundle,
+not in each result record, so this analyzer does not assume or reconstruct a threshold.
+
+====================================================================================================
+6. WORKER DISTRIBUTION AND PERFORMANCE
+====================================================================================================
+Worker                     Results     Share     Accuracy       FP       FN     Avg E2E ms
+------------------------------------------------------------------------------------------
+worker-05                  212,154    21.22%     98.0632%    1,718    2,391      26081.333
+worker-06                  194,609    19.46%     98.1085%    1,526    2,155      26048.527
+worker-07                  140,772    14.08%     98.0728%    1,083    1,630      26247.098
+worker-01                  140,636    14.06%     98.1093%    1,076    1,583      26169.937
+worker-03                  105,641    10.56%     98.0718%      852    1,185      26191.270
+worker-02                  103,332    10.33%     98.0635%      815    1,186      26196.404
+worker-04                  102,856    10.29%     98.0468%      860    1,149      26172.443
+
+====================================================================================================
+7. SINGLE-BRANCH PIPELINE CONSISTENCY
+====================================================================================================
+Route distribution:
+  worker                :    1,000,000 (100.00%)
+
+Model distribution:
+  FastText_CNN_LSTM_FD32_300to128_LastValid:    1,000,000 (100.00%)
+
+Unexpected non-worker route: 0
+Pipeline status           : Consistent with single-branch architecture
+
+====================================================================================================
+8. END-TO-END LATENCY
+====================================================================================================
+Samples                  : 1,000,000
+Average                  : 26143.620 ms
+P50                      : 27080.314 ms
+P95                      : 28176.249 ms
+P99                      : 29104.690 ms
+Maximum                  : 30277.873 ms
+
+E2E is computed from result.created_at to result.completed_at. In this project created_at is set
+by the Router immediately before publishing jobs, so E2E includes queue wait + worker batching +
+CNN-LSTM predict_many() processing, but not CSV loading or the router's earlier source work.
+
+====================================================================================================
+9. DGA FAMILY ANALYSIS
+====================================================================================================
+Family                             Samples          TP          FN         Recall
+---------------------------------------------------------------------------------
+ccleaner                            64,430      64,430           0        100.00%
+qadars                              23,924      23,892          32         99.87%
+gozi                                15,941      14,052       1,889         88.15%
+suppobox                            12,170      12,078          92         99.24%
+deepdga                              9,722       9,722           0        100.00%
+improved_pykspa                      8,209       7,330         879         89.29%
+titan                                8,113       4,761       3,352         58.68%
+bigviktor                            6,659       5,524       1,135         82.96%
+enviserv                             6,587       6,571          16         99.76%
+chinad                               6,529       6,472          57         99.13%
+mydoom                               6,119       6,055          64         98.95%
+dnschanger                           4,379       4,027         352         91.96%
+murofetv1                            4,361       4,361           0        100.00%
+ranbyus                              4,347       4,339           8         99.82%
+banjori                              4,323       4,323           0        100.00%
+fobber                               4,205       4,189          16         99.62%
+ramnit                               4,189       4,155          34         99.19%
+nymaim                               4,177       3,373         804         80.75%
+vawtrak                              4,171       4,106          65         98.44%
+vawtrak_1                            4,162       4,162           0        100.00%
+ramdo                                4,122       4,122           0        100.00%
+qakbot                               4,073       4,016          57         98.60%
+newgoz                               4,063       4,063           0        100.00%
+vawktrak_1                           4,035       4,035           0        100.00%
+necurs                               4,032       3,837         195         95.16%
+murofetv3                            4,007       4,007           0        100.00%
+dircrypt                             3,940       3,648         292         92.59%
+proslikefan                          3,889       2,755       1,134         70.84%
+precursor_pykspa                     3,805       3,709          96         97.48%
+locklyv3                             3,757       3,577         180         95.21%
+simda                                3,709       3,709           0        100.00%
+tempedreve                           2,975       2,690         285         90.42%
+murofetv2                            2,261       2,253           8         99.65%
+shiotob                              1,648       1,607          41         97.51%
+kraken_v2                            1,430       1,268         162         88.67%
+tinba                                1,036       1,010          26         97.49%
+padcrypt                                74          74           0        100.00%
+vidro                                   58          50           8         86.21%
+sisron                                   9           9           0        100.00%
+locklyv2                                 8           8           0        100.00%
+kraken_v1                                8           8           0        100.00%
+
+====================================================================================================
+10. WORST DGA FAMILIES BY RECALL
+====================================================================================================
+Family                             Samples          FN         Recall
+---------------------------------------------------------------------
+titan                                8,113       3,352         58.68%
+proslikefan                          3,889       1,134         70.84%
+nymaim                               4,177         804         80.75%
+bigviktor                            6,659       1,135         82.96%
+vidro                                   58           8         86.21%
+gozi                                15,941       1,889         88.15%
+kraken_v2                            1,430         162         88.67%
+improved_pykspa                      8,209         879         89.29%
+tempedreve                           2,975         285         90.42%
+dnschanger                           4,379         352         91.96%
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/results_1M_report.txt

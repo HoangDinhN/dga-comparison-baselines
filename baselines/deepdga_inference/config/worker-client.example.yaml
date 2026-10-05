@@ -1,0 +1,33 @@
+rabbitmq:
+  url: "${DGA_RABBITMQ_URL:-amqp://guest:guest@localhost:5672/%2F}"
+  queue_prefix: "${DGA_QUEUE_PREFIX:-dga.deepdga}"
+  heartbeat_seconds: 30
+  blocked_timeout_seconds: 60
+  connection_attempts: 10
+  retry_delay_seconds: 2
+  socket_timeout_seconds: 10
+  durable: true
+  queue_type: "classic"
+  persistent_messages: false
+
+client:
+  id: "worker-07"
+  preferred_role: "worker"
+  capabilities: ["worker"]
+  registration_interval_seconds: 5
+  artifact_download_timeout_seconds: 300
+  strict_artifacts: true
+  switch_timeout_seconds: 30
+  control_queue_expiry_ms: 86400000
+  control_queue_max_messages: 20
+
+workers:
+  worker:
+    # Notebook DeepDGA được huấn luyện/đánh giá với batch_size=32.
+    # Đổi cùng một giá trị giữa các baseline nếu benchmark testbed yêu cầu.
+    batch_size: 32
+    batch_wait_ms: 5
+    prefetch: 32
+
+metrics:
+  report_interval_seconds: 10

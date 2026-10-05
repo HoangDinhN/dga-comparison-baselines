@@ -1,0 +1,157 @@
+====================================================================================================
+BILBO TELEMETRY ANALYSIS REPORT
+====================================================================================================
+File                     : var/test_genAI/telemetrys.jsonl
+Architecture             : Single branch (Router passthrough -> jobs.worker -> Bilbo workers)
+
+====================================================================================================
+1. DATA INTEGRITY
+====================================================================================================
+Total lines              : 263
+Valid metric records     : 263
+JSON errors              : 0
+Non-metric records       : 0
+Client count             : 8
+Router clients           : router-01
+Worker clients           : worker-01, worker-02, worker-03, worker-04, worker-05, worker-06, worker-07
+Unknown-role records     : 0
+Experiment duration      : 336.559 s
+
+Detected vCPU count from telemetry:
+  router-01               : 2
+  worker-01               : 2
+  worker-02               : 1
+  worker-03               : 1
+  worker-04               : 1
+  worker-05               : 4
+  worker-06               : 4
+  worker-07               : 2
+
+====================================================================================================
+2. WORKLOAD DISTRIBUTION
+====================================================================================================
+Worker count             : 7
+Total processed          : 1,000,000 domains
+Predicted Benign         : 753,219
+Predicted DGA            : 246,781
+Telemetry accuracy       : 96.9001% (969,001/1,000,000)
+
+Worker                        Processed     Load share
+------------------------------------------------------
+worker-05                       169,015         16.90%
+worker-06                       167,784         16.78%
+worker-01                       142,126         14.21%
+worker-07                       141,682         14.17%
+worker-03                       127,209         12.72%
+worker-02                       126,323         12.63%
+worker-04                       125,861         12.59%
+
+====================================================================================================
+3. THROUGHPUT
+====================================================================================================
+Average worker throughput: 429.929 domains/s
+Average throughput/vCPU  : 260.997 domains/s/vCPU
+System throughput        : 2973.264 domains/s
+Worker wall-clock span   : 336.331 s
+
+Worker                   vCPU     Processed     Active(s)      domains/s    domains/s/vCPU
+------------------------------------------------------------------------------------------
+worker-01                   2       142,126       329.689        431.091           215.546
+worker-02                   1       126,323       331.981        380.513           380.513
+worker-03                   1       127,209       334.039        380.820           380.820
+worker-04                   1       125,861       336.296        374.257           374.257
+worker-05                   4       169,015       328.192        514.988           128.747
+worker-06                   4       167,784       330.088        508.300           127.075
+worker-07                   2       141,682       332.370        426.278           213.139
+
+====================================================================================================
+4. INFERENCE LATENCY
+====================================================================================================
+Average inference latency: 1.405 ms
+P95 inference latency*   : 2.080 ms
+
+* P95 here is the processed-weighted mean of each telemetry window's reported P95;
+  it is not the exact global P95 across all domains.
+  In bilbo_inference, inference_ms is batch predict_many() time divided by batch size,
+  so it includes SLD normalization/encoding + tensor creation + Bilbo forward + output handling.
+
+====================================================================================================
+5. END-TO-END LATENCY
+====================================================================================================
+Average E2E latency      : 22958.302 ms
+P95 E2E latency*         : 24684.803 ms
+
+* P95 here is the processed-weighted mean of window P95 values, not an exact global P95.
+  E2E starts from Router-created created_at immediately before job publishing and ends after
+  worker prediction completion; it therefore reflects queueing + batching + model pipeline time.
+
+====================================================================================================
+6. CPU UTILIZATION
+====================================================================================================
+Client                  Role         vCPU    Normalized CPU %    System CPU %
+-----------------------------------------------------------------------------
+router-01               router          2               26.82           27.28
+worker-01               worker          2               52.33           53.68
+worker-02               worker          1               78.76           79.34
+worker-03               worker          1               78.69           79.15
+worker-04               worker          1               78.62           79.47
+worker-05               worker          4               33.62           34.23
+worker-06               worker          4               33.66           34.11
+worker-07               worker          2               51.34           52.14
+
+====================================================================================================
+7. MEMORY UTILIZATION
+====================================================================================================
+Client                  Role          Process RAM MB    System RAM %
+--------------------------------------------------------------------
+router-01               router                248.02           17.49
+worker-01               worker                319.70           18.12
+worker-02               worker                311.05           16.92
+worker-03               worker                313.22           16.47
+worker-04               worker                313.87           14.98
+worker-05               worker                315.25           25.06
+worker-06               worker                317.67           20.35
+worker-07               worker                314.54           25.10
+
+Total mean worker RSS    : 2205.30 MB (sum of per-worker mean RSS)
+
+====================================================================================================
+8. ERRORS & STABILITY
+====================================================================================================
+Total errors             : 0
+Windows with errors      : 0
+Status                   : Stable - no telemetry errors detected
+
+====================================================================================================
+9. ROUTER / SINGLE-BRANCH PIPELINE
+====================================================================================================
+Router count             : 1
+Worker count             : 7
+Total routed             : 1,000,000 domains
+Routed to jobs.worker    : 1,000,000 domains
+Total worker processed   : 1,000,000 domains
+Processed / routed       : 100.00%
+Router throughput        : 3827.459 domains/s
+Router decision latency  : 0.000 ms avg
+Router decision P95*     : 0.000 ms
+
+The router is passthrough: all jobs should be routed to jobs.worker. routing_ms measures only
+the trivial single-branch routing decision, not RabbitMQ publish/network latency.
+
+====================================================================================================
+10. BOTTLENECK INDICATORS
+====================================================================================================
+E2E / inference ratio    : 16338.52x
+
+[1] Queue/backlog dominates: E2E latency is much larger than Bilbo inference time.
+[2] CPU: no worker shows sustained >=85% CPU saturation in the averaged telemetry.
+[3] Workload is approximately balanced across workers (12.59% - 16.90%).
+[4] Memory: no client has average system RAM usage >=85%.
+[5] Pipeline completion: worker processed count matches router routed count.
+[6] Stability: no telemetry errors were recorded.
+
+====================================================================================================
+ANALYSIS COMPLETED
+====================================================================================================
+
+Report saved to: var/test_genAI/telemetrys_report.txt
