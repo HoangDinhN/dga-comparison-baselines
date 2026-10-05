@@ -2,7 +2,6 @@
 
 Repository này lưu trữ đầy đủ năm baseline được sử dụng để đánh giá bài toán phát hiện tên miền sinh bởi Domain Generation Algorithm (DGA). Mỗi project bao gồm bài báo tham chiếu, notebook huấn luyện, artifact triển khai, mã inference, cấu hình testbed, kiểm thử, kết quả thô và báo cáo.
 
-Repository chỉ chứa các baseline so sánh; phương pháp đề xuất, Router phân nhánh, Light Branch và Heavy Branch không nằm trong repository này.
 
 ## Baselines
 
